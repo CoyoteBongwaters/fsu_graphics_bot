@@ -1,0 +1,17 @@
+{
+  "commit": {"template_path": "templates/commit_template.psd",
+    "notes": "For player commitments"
+  },
+  "transfer": {"template_path": "templates/transfer_template.psd",
+    "notes": "For transfer stories"
+  },
+  "injury": {"template_path": "templates/injury_template.psd",
+    "notes": "Use red accent if season-ending"
+  },
+  "result": {"template_path": "templates/game_result_template.psd",
+    "notes": "Standard score graphic"
+  },
+  "unknown": {"template_path": "templates/generic_template.psd",
+    "notes": "Fallback for unclassified events"
+  }
+}
