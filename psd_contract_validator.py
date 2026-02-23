@@ -78,6 +78,32 @@ def validate_psd_contracts(repo_root: Path) -> list[PsdContractIssue]:
                 )
             )
             continue
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except Exception as e:
+            issues.append(
+                PsdContractIssue(
+                    event_type=event_type,
+                    manifest_path=manifest_path,
+                    missing_layers=[f"<invalid manifest json: {e}>"],
+                    duplicated_layers=[],
+                )
+            )
+            continue
+        smart_layers = manifest.get("smart_object_layers", [])
+        if smart_layers is None:
+            smart_layers = []
+        if not isinstance(smart_layers, list) or not all(isinstance(x, str) and x.strip() for x in smart_layers):
+            issues.append(
+                PsdContractIssue(
+                    event_type=event_type,
+                    manifest_path=manifest_path,
+                    missing_layers=[f"<invalid smart_object_layers in manifest>"],
+                    duplicated_layers=[],
+                )
+            )
+            continue
+        smart_layers_set = {x.strip() for x in smart_layers}                
 
         try:
             manifest_layers = set(_load_manifest_layers(manifest_path))
@@ -93,6 +119,19 @@ def validate_psd_contracts(repo_root: Path) -> list[PsdContractIssue]:
             continue
 
         expected, duplicated = _expected_layers(spec)
+        # Enforce smart-object layer contract:
+        # any image binding declared as type="smart_object" in template_map.json
+        # must be explicitly declared in the PSD manifest's smart_object_layers.
+        render_spec = spec.get("render_spec") or {}
+        images_spec = render_spec.get("images") or {}
+        if isinstance(images_spec, dict):
+            for layer_name, bind in images_spec.items():
+                if isinstance(bind, dict) and bind.get("type") == "smart_object":
+                    if layer_name not in smart_layers_set:
+                        missing.append(
+                            f"<smart object contract: {layer_name!r} is type='smart_object' in template_map.json "
+                            f"but is missing from manifest smart_object_layers>"
+                        )        
         missing = sorted([layer for layer in expected if layer not in manifest_layers])
         extra = sorted([layer for layer in manifest_layers if layer not in expected])
 
@@ -100,14 +139,6 @@ def validate_psd_contracts(repo_root: Path) -> list[PsdContractIssue]:
             if extra:
                 missing.append(f"<manifest has extra layers not referenced by template spec: {', '.join(extra)}>")
 
-            issues.append(
-                PsdContractIssue(
-                    event_type=event_type,
-                    manifest_path=manifest_path,
-                    missing_layers=missing,
-                    duplicated_layers=duplicated,
-                )
-            )
             issues.append(
                 PsdContractIssue(
                     event_type=event_type,

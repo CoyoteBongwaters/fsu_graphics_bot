@@ -1,5 +1,8 @@
 {
   "schema_version": 1,
+"smart_object_layers": [
+  "PLAYER_CUTOUT"
+],
   "layers": [
     "TEXT_WINNER",
     "TEXT_LOSER",

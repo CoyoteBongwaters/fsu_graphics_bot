@@ -62,7 +62,7 @@ def build_render_plan(event: Event) -> list[dict[str, Any]]:
 
         if isinstance(image_spec, str):
             bind_path = image_spec
-            image_type = None
+            image_type = "pixel"
         elif isinstance(image_spec, dict):
             bind_path = image_spec.get("binding")
             image_type = image_spec.get("type")

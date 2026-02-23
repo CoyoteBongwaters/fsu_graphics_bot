@@ -30,7 +30,7 @@
         "LOGO_SECONDARY": "assets.logo_secondary",
         "HEADSHOT": "assets.headshot",
         "BACKGROUND": { "binding": "assets.background", "type": "pixel" },
-        "PLAYER_CUTOUT": { "binding": "assets.player_cutout", "type": "pixel" }
+        "PLAYER_CUTOUT": { "binding": "assets.player_cutout", "type": "smart_object" }
       },
       "toggles": {
         "HAS_HEADSHOT": "assets.headshot",

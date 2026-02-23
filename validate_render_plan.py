@@ -23,6 +23,9 @@ def main() -> int:
     data = json.loads(latest.read_text(encoding="utf-8"))
 
     errors: list[str] = []
+    # If template_map.json specifies an image type for a given image layer binding,
+    # enforce that the generated render_plan carries matching meta.image_type.
+    expected_image_types: dict[str, str] = {}
     # Validate render_plan layer targets against PSD layer manifest for this event_type
     allowed_layers: set[str] | None = None
 
@@ -35,6 +38,16 @@ def main() -> int:
         if not isinstance(spec, dict):
             errors.append(f"event_type {event_type!r} not found in template_map.json (needed for manifest validation).")
         else:
+            render_spec = spec.get("render_spec") or {}
+            images_spec = (render_spec.get("images") or {}) if isinstance(render_spec, dict) else {}
+            if isinstance(images_spec, dict):
+                for layer_name, image_bind in images_spec.items():
+                    if not isinstance(layer_name, str) or not layer_name.strip():
+                        continue
+                    if isinstance(image_bind, dict):
+                        t = image_bind.get("type")
+                        if t in {"smart_object", "pixel"}:
+                            expected_image_types[layer_name] = t
             template_path = spec.get("template_path")
             if not isinstance(template_path, str) or not template_path.strip():
                 errors.append(f"{event_type}: template_path missing/invalid (needed for manifest validation).")
@@ -77,7 +90,16 @@ def main() -> int:
                 v = op.get("value")
                 if not isinstance(v, bool):
                     errors.append(f"render_plan[{i}].value must be boolean for op=toggle.")
-
+            if o == "set_image" and isinstance(layer, str) and layer.strip():
+                expected = expected_image_types.get(layer)
+                if expected is not None:
+                    meta = op.get("meta")
+                    image_type = meta.get("image_type") if isinstance(meta, dict) else None
+                    if image_type != expected:
+                        errors.append(
+                            f"render_plan[{i}] set_image meta.image_type mismatch for layer {layer!r}: "
+                            f"expected {expected!r}, got {image_type!r}"
+                        )
     if errors:
         print(f"RENDER PLAN VALIDATION: FAILED ({latest.name})\n")
         for e in errors:
