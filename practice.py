@@ -3,9 +3,12 @@ from datetime import datetime, UTC  # (UTC = timezone constant)
 from pathlib import Path  # (Path = safe file paths)
 from team_data import TEAM_ALIASES
 import re  # add near the top if not already imported
-from template_engine import get_template_info
+from template_engine import select_template
 from asset_resolver import resolve_assets
-
+from models import Event
+from typing import Any
+from render_plan_engine import build_render_plan
+from runner import PreviewRunner
 
 def classify_event(headline: str) -> str:
     h = headline.lower()
@@ -120,35 +123,82 @@ def detect_teams(headline: str) -> list[str]:
     ordered = sorted(scores.items(), key=lambda kv: kv[1], reverse=True)
     return [team_id for team_id, _score in ordered]
 
+def extract_score(headline: str) -> tuple[int, int] | None:
+    """
+    Extract a score like '24-7' or '12–0' from the headline.
+    Returns (a, b) or None if not found.
+    """
+    h = headline.replace("\u2013", "-").replace("\u2014", "-")  # normalize en/em dash
+    m = re.search(r"\b(\d{1,3})\s*-\s*(\d{1,3})\b", h)
+    if not m:
+        return None
+    return int(m.group(1)), int(m.group(2))
+
 def main():
     headline = input("Paste headline: ").strip()
     print("DEBUG practice.py path:", __file__)
     print("DEBUG python:", __import__("sys").executable)
     print("DEBUG result_words contains victory? (manual check)")
+
     if not headline:
         print("No headline entered. Exiting.")
         return
 
     event_type = classify_event(headline)
+    teams = detect_teams(headline) or ["FSU"]
 
-    # --- Get template metadata from engine ---
-    template_info = get_template_info(event_type)
+    meta: dict[str, int | str] = {}
 
-    event = {
-        "source": "manual",
-        "headline": headline,
-        "event_type": event_type,
-        "teams": detect_teams(headline) or ["FSU"],  # (fallback = use FSU if none found)
-        "players": extract_players(headline),
-        "created_at_utc": datetime.now(UTC).isoformat(timespec="seconds"),
-        "template": template_info,
-    
-    }
+    if event_type == "result":
+        score = extract_score(headline)
+        if score is not None:
+            a, b = score
+            meta["score_a"] = a
+            meta["score_b"] = b
 
-# Attach resolved asset paths
-    event = resolve_assets(event)
+            team_a = teams[0]
+            team_b = teams[1] if len(teams) > 1 else "UNKNOWN"
 
-    # --- Create organized output folders ---
+            meta["team_a"] = team_a
+            meta["team_b"] = team_b
+
+            if a > b:
+                meta["winner"] = team_a
+                meta["loser"] = team_b
+                meta["winner_score"] = a
+                meta["loser_score"] = b
+            elif b > a:
+                meta["winner"] = team_b
+                meta["loser"] = team_a
+                meta["winner_score"] = b
+                meta["loser_score"] = a
+            else:
+                meta["winner"] = "TIE"
+                meta["loser"] = "TIE"
+                meta["winner_score"] = a
+                meta["loser_score"] = b
+
+    style_profile = "default"
+
+    event = Event(
+        source="manual",
+        headline=headline,
+        event_type=event_type,
+        teams=teams,
+        players=extract_players(headline),
+        created_at_utc=datetime.now(UTC).isoformat(timespec="seconds"),
+        meta=meta or None,
+        style_profile=style_profile,
+    )
+
+    event.template = select_template(event)
+    event.assets = resolve_assets(event)
+    event.render_plan = build_render_plan(event)
+    runner = PreviewRunner()
+    run_result = runner.run(event)
+    if run_result.log_path:
+        print(f"Runner log: {run_result.log_path}")
+
     base_out = Path("out")
     json_dir = base_out / "json"
     png_dir = base_out / "png"
@@ -157,15 +207,21 @@ def main():
     for d in (json_dir, png_dir, psd_dir):
         d.mkdir(parents=True, exist_ok=True)
 
-    # --- Build the JSON file path ---
     timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     out_path = json_dir / f"{timestamp}_{event_type}.json"
 
+    out_path.write_text(
+        json.dumps(event.to_dict(), indent=2),
+        encoding="utf-8",
+    )
 
-    out_path.write_text(json.dumps(event, indent=2), encoding="utf-8")
     print(f"Saved: {out_path}")
-    print(event)
-
+    data = event.to_dict()
+    print(
+        f"Summary: event_type={data.get('event_type')} "
+        f"teams={data.get('teams')} "
+        f"players={data.get('players')}"
+    )
 def menu():
     """Simple text-based menu loop."""
     while True:
@@ -188,6 +244,35 @@ def menu():
             break
         else:
             print("Invalid choice. Please enter 1, 2, or 3.")
+
+def extract_players(headline: str) -> list[str]:
+    """
+    Deterministic player extractor.
+    Assumes player names are written in ALL CAPS.
+    Example: 'FSU: TEST PLAYER scores 28 points'
+    """
+
+    words = headline.split()
+    candidates = []
+
+    current_name = []
+
+    for word in words:
+        if word.isupper() and word.isalpha():
+            current_name.append(word)
+        else:
+            if len(current_name) >= 2:
+                candidates.append(" ".join(current_name))
+            current_name = []
+
+    # Catch trailing name
+    if len(current_name) >= 2:
+        candidates.append(" ".join(current_name))
+
+    # Remove obvious team names
+    filtered = [name for name in candidates if name not in ["FSU", "MIAMI"]]
+
+    return filtered
 def list_recent_json():
     """Display the most recent JSON files."""
     json_dir = Path("out/json")

@@ -1,17 +1,54 @@
 {
-  "commit": {"template_path": "templates/commit_template.psd",
-    "notes": "For player commitments"
+  "commit": {
+    "template_path": "templates/commit_template.psd",
+    "notes": "Commit graphic"
   },
-  "transfer": {"template_path": "templates/transfer_template.psd",
-    "notes": "For transfer stories"
+  "transfer": {
+    "template_path": "templates/transfer_template.psd",
+    "notes": "Transfer graphic"
   },
-  "injury": {"template_path": "templates/injury_template.psd",
-    "notes": "Use red accent if season-ending"
+  "injury": {
+    "template_path": "templates/injury_template.psd",
+    "notes": "Injury graphic"
   },
-  "result": {"template_path": "templates/game_result_template.psd",
-    "notes": "Standard score graphic"
+  "award": {
+    "template_path": "templates/award_template.psd",
+    "notes": "Award graphic"
   },
-  "unknown": {"template_path": "templates/generic_template.psd",
+  "result": {
+    "template_path": "templates/game_result_template.psd",
+    "notes": "Standard score graphic",
+    "render_spec": {
+      "text": {
+        "TEXT_WINNER": "meta.winner",
+        "TEXT_LOSER": "meta.loser",
+        "TEXT_WINNER_SCORE": "meta.winner_score",
+        "TEXT_LOSER_SCORE": "meta.loser_score"
+      },
+      "images": {
+        "LOGO_PRIMARY": "assets.logo_primary",
+        "LOGO_SECONDARY": "assets.logo_secondary",
+        "HEADSHOT": "assets.headshot",
+        "BACKGROUND": { "binding": "assets.background", "type": "pixel" },
+        "PLAYER_CUTOUT": { "binding": "assets.player_cutout", "type": "pixel" }
+      },
+      "toggles": {
+        "HAS_HEADSHOT": "assets.headshot",
+        "HAS_PLAYER_CUTOUT": "assets.player_cutout"
+      }
+    },
+    "style_spec": {
+      "default": {
+        "toggles": {
+          "FX_GRAIN": true,
+          "FX_TEXTURE_OVERLAY": true,
+          "FX_LIGHTLEAK": false
+        }
+      }
+    }
+  },            
+  "unknown": {
+    "template_path": "templates/generic_template.psd",
     "notes": "Fallback for unclassified events"
   }
 }

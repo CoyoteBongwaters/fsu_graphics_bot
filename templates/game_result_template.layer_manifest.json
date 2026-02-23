@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "layers": [
+    "TEXT_WINNER",
+    "TEXT_LOSER",
+    "TEXT_WINNER_SCORE",
+    "TEXT_LOSER_SCORE",
+    "LOGO_PRIMARY",
+    "LOGO_SECONDARY",
+    "HEADSHOT",
+    "PLAYER_CUTOUT",
+    "BACKGROUND",
+    "HAS_HEADSHOT",
+    "HAS_PLAYER_CUTOUT",
+    "FX_GRAIN",
+    "FX_TEXTURE_OVERLAY",
+    "FX_LIGHTLEAK"
+  ]
+}
