@@ -27,6 +27,7 @@ class Event:
     source: str
     headline: str
     event_type: str
+    template_key: str
     teams: list[str]
     players: list[str]
     created_at_utc: str
@@ -37,11 +38,15 @@ class Event:
     style_profile: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
+        key = (self.template_key or "").strip()
+        if not key:
+            raise ValueError("Event.template_key is required (empty/whitespace).")
         out: dict[str, Any] = {
             "schema_version": 1,
             "source": self.source,
             "headline": self.headline,
             "event_type": self.event_type,
+            "template_key": key,
             "teams": self.teams,
             "players": self.players,
             "created_at_utc": self.created_at_utc,

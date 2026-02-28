@@ -25,6 +25,11 @@ def classify_event(headline: str) -> str:
 )
     award_words = ("award", "wins award", "named", "player of the year",
                    "earns honor", "receives")
+    
+    # If the headline contains a score like "45-0" or "45 – 0", it's a result.
+    if re.search(r"\b\d{1,3}\s*[-–]\s*\d{1,3}\b", h):
+        return "result"
+    
     def has_keyword(words: tuple[str, ...]) -> bool:
         """Match either whole words (single tokens) or phrases (substring)."""
         for w in words:
@@ -184,6 +189,7 @@ def main():
         source="manual",
         headline=headline,
         event_type=event_type,
+        template_key=f"fsu.{event_type}",
         teams=teams,
         players=extract_players(headline),
         created_at_utc=datetime.now(UTC).isoformat(timespec="seconds"),
@@ -245,34 +251,6 @@ def menu():
         else:
             print("Invalid choice. Please enter 1, 2, or 3.")
 
-def extract_players(headline: str) -> list[str]:
-    """
-    Deterministic player extractor.
-    Assumes player names are written in ALL CAPS.
-    Example: 'FSU: TEST PLAYER scores 28 points'
-    """
-
-    words = headline.split()
-    candidates = []
-
-    current_name = []
-
-    for word in words:
-        if word.isupper() and word.isalpha():
-            current_name.append(word)
-        else:
-            if len(current_name) >= 2:
-                candidates.append(" ".join(current_name))
-            current_name = []
-
-    # Catch trailing name
-    if len(current_name) >= 2:
-        candidates.append(" ".join(current_name))
-
-    # Remove obvious team names
-    filtered = [name for name in candidates if name not in ["FSU", "MIAMI"]]
-
-    return filtered
 def list_recent_json():
     """Display the most recent JSON files."""
     json_dir = Path("out/json")

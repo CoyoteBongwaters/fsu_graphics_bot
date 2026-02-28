@@ -39,8 +39,17 @@ def build_render_plan(event: Event) -> list[dict[str, Any]]:
     Output is a list of dicts for JSON stability.
     """
     templates = load_template_map()
-    info = templates.get(event.event_type, templates.get("unknown", {}))
-    render_spec = info.get("render_spec", {}) or {}
+    key = (event.template_key or "").strip()
+    if not key:
+        raise ValueError("Event.template_key is required (empty).")
+
+    info = templates.get(key)
+    if not info:
+        raise KeyError(f"Unknown template_key: {key!r}. Not found in template_map.json")
+
+    render_spec = info.get("render_spec")
+    if not render_spec:
+        raise ValueError(f"Template render_spec is missing/empty for template_key={key!r}")    
     style_spec = info.get("style_spec", {}) or {}
 
     binding = event.to_dict()

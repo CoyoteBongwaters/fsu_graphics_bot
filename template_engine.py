@@ -13,8 +13,13 @@ def load_template_map() -> dict:
 def select_template(event: Event) -> TemplateInfo:
     """Return template metadata for this event."""
     templates = load_template_map()
-    info = templates.get(event.event_type, templates.get("unknown", {}))
+    key = (event.template_key or "").strip()
+    if not key:
+        raise ValueError("Event.template_key is required (empty).")
 
+    info = templates.get(key)
+    if not info:
+        raise KeyError(f"Unknown template_key: {key!r}. Not found in template_map.json")
     if not info:
         print(f"⚠️  No template found for event_type: {event.event_type}")
         return TemplateInfo(template_path="")
@@ -30,6 +35,6 @@ def select_template(event: Event) -> TemplateInfo:
         template_path=str(template_path),
         notes=info.get("notes", ""),
         template_found=template_found,
-        event_type=event.event_type,
+        event_type=event.template_key,
         template_file=template_path.name,
     )

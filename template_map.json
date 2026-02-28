@@ -1,19 +1,147 @@
 {
   "commit": {
     "template_path": "templates/commit_template.psd",
-    "notes": "Commit graphic"
+    "notes": "Commit graphic",
+    "render_spec": {
+      "text": {
+        "PLAYER_NAME": "meta.player_name",
+        "HEADLINE": "headline"
+      },
+      "images": {
+        "PLAYER_PHOTO": {
+          "binding": "assets.headshot",
+          "type": "smart_object"
+        }
+      },
+      "toggles": {
+        "HAS_HEADSHOT": "assets.headshot",
+        "HAS_PLAYER_CUTOUT": "assets.player_cutout"
+      }
+    }
+  },
+  "fsu.commit": {
+    "template_path": "templates/commit_template.psd",
+    "notes": "Commit graphic",
+    "render_spec": {
+      "text": {
+        "PLAYER_NAME": "meta.player_name",
+        "HEADLINE": "headline"
+      },
+      "images": {
+        "PLAYER_PHOTO": {
+          "binding": "assets.headshot",
+          "type": "smart_object"
+        }
+      },
+      "toggles": {
+        "HAS_HEADSHOT": "assets.headshot",
+        "HAS_PLAYER_CUTOUT": "assets.player_cutout"
+      }
+    }
   },
   "transfer": {
     "template_path": "templates/transfer_template.psd",
-    "notes": "Transfer graphic"
+    "notes": "Transfer graphic",
+    "render_spec": {
+      "text": {
+        "PLAYER_NAME": "meta.player_name",
+        "HEADLINE": "headline"
+      },
+      "images": {
+        "PLAYER_PHOTO": {
+          "binding": "assets.player_cutout",
+          "type": "smart_object"
+        },
+        "HEADSHOT": "assets.headshot"
+      },
+      "toggles": {
+        "HAS_PLAYER_CUTOUT": "assets.player_cutout",
+        "HAS_HEADSHOT": "assets.headshot"
+      }
+    }
+  },
+  "fsu.transfer": {
+    "template_path": "templates/transfer_template.psd",
+    "notes": "Transfer graphic",
+    "render_spec": {
+      "text": {
+        "PLAYER_NAME": "meta.player_name",
+        "HEADLINE": "headline"
+      },
+      "images": {
+        "PLAYER_PHOTO": {
+          "binding": "assets.player_cutout",
+          "type": "smart_object"
+        },
+        "HEADSHOT": "assets.headshot"
+      },
+      "toggles": {
+        "HAS_PLAYER_CUTOUT": "assets.player_cutout",
+        "HAS_HEADSHOT": "assets.headshot"
+      }
+    }
+  },
+  "breaking_news": {
+    "template_path": "templates/breaking_news_template.psd",
+    "notes": "Breaking news graphic",
+    "render_spec": {
+      "text": {
+        "PLAYER_NAME": "meta.player_name",
+        "HEADLINE": "headline"
+      },
+      "images": {
+        "PLAYER_PHOTO": {
+          "binding": "assets.player_cutout",
+          "type": "smart_object"
+        },
+        "HEADSHOT": "assets.headshot"
+      },
+      "toggles": {
+        "HAS_PLAYER_CUTOUT": "assets.player_cutout",
+        "HAS_HEADSHOT": "assets.headshot"
+      }
+    }
+  },
+  "fsu.breaking_news": {
+    "template_path": "templates/breaking_news_template.psd",
+    "notes": "Breaking news graphic",
+    "render_spec": {
+      "text": {
+        "PLAYER_NAME": "meta.player_name",
+        "HEADLINE": "headline"
+      },
+      "images": {
+        "PLAYER_PHOTO": {
+          "binding": "assets.player_cutout",
+          "type": "smart_object"
+        },
+        "HEADSHOT": "assets.headshot"
+      },
+      "toggles": {
+        "HAS_PLAYER_CUTOUT": "assets.player_cutout",
+        "HAS_HEADSHOT": "assets.headshot"
+      }
+    }
   },
   "injury": {
     "template_path": "templates/injury_template.psd",
-    "notes": "Injury graphic"
+    "notes": "Injury graphic",
+    "render_spec": {}
+  },
+  "fsu.injury": {
+    "template_path": "templates/injury_template.psd",
+    "notes": "Injury graphic",
+    "render_spec": {}
   },
   "award": {
     "template_path": "templates/award_template.psd",
-    "notes": "Award graphic"
+    "notes": "Award graphic",
+    "render_spec": {}
+  },
+  "fsu.award": {
+    "template_path": "templates/award_template.psd",
+    "notes": "Award graphic",
+    "render_spec": {}
   },
   "result": {
     "template_path": "templates/game_result_template.psd",
@@ -29,8 +157,14 @@
         "LOGO_PRIMARY": "assets.logo_primary",
         "LOGO_SECONDARY": "assets.logo_secondary",
         "HEADSHOT": "assets.headshot",
-        "BACKGROUND": { "binding": "assets.background", "type": "pixel" },
-        "PLAYER_CUTOUT": { "binding": "assets.player_cutout", "type": "smart_object" }
+        "BACKGROUND": {
+          "binding": "assets.background",
+          "type": "pixel"
+        },
+        "PLAYER_CUTOUT": {
+          "binding": "assets.player_cutout",
+          "type": "smart_object"
+        }
       },
       "toggles": {
         "HAS_HEADSHOT": "assets.headshot",
@@ -46,7 +180,45 @@
         }
       }
     }
-  },            
+  },
+  "fsu.result": {
+    "template_path": "templates/game_result_template.psd",
+    "notes": "Standard score graphic",
+    "render_spec": {
+      "text": {
+        "TEXT_WINNER": "meta.winner",
+        "TEXT_LOSER": "meta.loser",
+        "TEXT_WINNER_SCORE": "meta.winner_score",
+        "TEXT_LOSER_SCORE": "meta.loser_score"
+      },
+      "images": {
+        "LOGO_PRIMARY": "assets.logo_primary",
+        "LOGO_SECONDARY": "assets.logo_secondary",
+        "HEADSHOT": "assets.headshot",
+        "BACKGROUND": {
+          "binding": "assets.background",
+          "type": "pixel"
+        },
+        "PLAYER_CUTOUT": {
+          "binding": "assets.player_cutout",
+          "type": "smart_object"
+        }
+      },
+      "toggles": {
+        "HAS_HEADSHOT": "assets.headshot",
+        "HAS_PLAYER_CUTOUT": "assets.player_cutout"
+      }
+    },
+    "style_spec": {
+      "default": {
+        "toggles": {
+          "FX_GRAIN": true,
+          "FX_TEXTURE_OVERLAY": true,
+          "FX_LIGHTLEAK": false
+        }
+      }
+    }
+  },
   "unknown": {
     "template_path": "templates/generic_template.psd",
     "notes": "Fallback for unclassified events"

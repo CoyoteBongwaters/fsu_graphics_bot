@@ -1,0 +1,1 @@
+{  "schema_version": 1,  "smart_object_layers": ["PLAYER_PHOTO"],  "layers": ["IMAGES", "TEAM_LOGO", "LOGO_SECONDARY", "TEXT", "PLAYER_NAME", "HEADLINE", "HAS_PLAYER_CUTOUT", "PLAYER_PHOTO", "HAS_HEADSHOT", "HEADSHOT", "FX_GRAIN", "FX_LIGHTLEAK", "FX_TEXTURE_OVERLAY", "Layer 3", "Layer 3 copy", "Layer 2", "Layer 1", "BACKGROUND", "BG", "Background"]}

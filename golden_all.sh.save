@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+
+if [[ -x "$ROOT/venv/bin/python3" ]]; then
+  PY="$ROOT/venv/bin/python3"
+else
+  PY="$(command -v python3)"
+fi
+
+echo "== Golden: CUTOUT mode =="
+"$PY" "$ROOT/golden_run.py" --python "$PY" --repo "$ROOT"
+
+echo
+echo "== Golden: FALLBACK mode =="
+"$PY" "$ROOT/golden_run_fallback.py" --python "$PY" --repo "$ROOT"
+
+echo
+echo "== Golden: NEGATIVE (commit must fail at plan build) =="
+"$PY" "$ROOT/golden_negative_commit.py"
+
+echo
+echo "== Golden: TRANSFER =="
+"$PY" "$ROOT/golden_run_transfer.py" --python "$PY" --repo "$ROOT"
+
+echo
+echo "== Golden: BREAKING NEWS =="
+"$PY" "$ROOT/golden_run_breaking_news.py" --python "$PY" --repo "$ROOT"
+
+echo
+echo "ALL GOLDENS PASSED"
+
+
+# Repo root = directory containing this script
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+
+# Prefer local venv if present; otherwise fall back to whatever python3 is on PATH.
+if [[ -x "$ROOT/venv/bin/python3" ]]; then
+  PY="$ROOT/venv/bin/python3"
+else
+  PY="$(command -v python3)"
+fi
+
+CUTOUT_JSON="$ROOT/out/json/20260224_203147_result.json"
+FALLBACK_JSON="$ROOT/out/json/20260224_202055_result.json"
+
+echo "== Golden: CUTOUT mode =="
+"$PY" "$ROOT/golden_run.py" --python "$PY" --repo "$ROOT" --event-json "$CUTOUT_JSON"
+
+echo
+echo "== Golden: FALLBACK mode =="
+"$PY" "$ROOT/golden_run_fallback.py" --python "$PY" --repo "$ROOT" --event-json "$FALLBACK_JSON"
+
+echo
+echo "== Golden: NEGATIVE (commit must fail at plan build) =="
+"$PY" "$ROOT/golden_negative_commit.py"
+X
+^X
+
+echo
+echo "ALL GOLDENS PASSED"
+^X
+
